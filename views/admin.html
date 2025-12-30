@@ -1,0 +1,24 @@
+<h2>Painel Administrativo</h2>
+
+<input id="title" placeholder="Título">
+<input id="level" placeholder="Nível">
+<textarea id="desc" placeholder="Descrição"></textarea>
+<button onclick="salvar()">Salvar</button>
+
+<script>
+async function salvar() {
+  await fetch('/admin/api/lesson', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'inglesdaqui123'
+    },
+    body: JSON.stringify({
+      title: title.value,
+      level: level.value,
+      description: desc.value
+    })
+  });
+  alert('Lição cadastrada!');
+}
+</script>
