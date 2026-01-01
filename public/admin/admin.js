@@ -1,14 +1,21 @@
-const API = "/api";
-
+const API = "/admin/api";
 const token = localStorage.getItem("token");
 
+/* =========================
+   REDIRECIONAMENTO BÁSICO
+========================= */
+
 if (token && location.pathname.includes("login")) {
-  location.href = "/admin/dashboard.html";
+  window.location.href = "/admin/dashboard.html";
 }
 
 if (!token && location.pathname.includes("dashboard")) {
-  location.href = "/admin/login.html";
+  window.location.href = "/admin/login.html";
 }
+
+/* =========================
+   LOGIN
+========================= */
 
 const form = document.getElementById("loginForm");
 
@@ -19,43 +26,72 @@ if (form) {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const res = await fetch(`${API}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
+    try {
+      const res = await fetch(`${API}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      document.getElementById("error").innerText = data.message;
-      return;
+      if (!res.ok) {
+        document.getElementById("error").innerText =
+          data.message || "Erro ao fazer login";
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      window.location.href = "/admin/dashboard.html";
+
+    } catch (err) {
+      document.getElementById("error").innerText =
+        "Erro de conexão com o servidor";
     }
-
-    localStorage.setItem("token", data.token);
-    location.href = "/admin/dashboard.html";
   });
 }
+
+/* =========================
+   DASHBOARD
+========================= */
 
 const list = document.getElementById("lessonList");
 
 if (list) {
-  fetch(`${API}/admin/lessons`, {
+  fetch(`${API}/lessons`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
   })
-    .then(res => res.json())
+    .then(res => {
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/admin/login.html";
+        return;
+      }
+      return res.json();
+    })
     .then(lessons => {
+      if (!lessons) return;
+
+      list.innerHTML = "";
+
       lessons.forEach(l => {
         const li = document.createElement("li");
-        li.innerText = l.title;
+        li.innerText = l.title || "(Sem título)";
         list.appendChild(li);
       });
+    })
+    .catch(() => {
+      localStorage.removeItem("token");
+      window.location.href = "/admin/login.html";
     });
 
-  document.getElementById("logout").onclick = () => {
-    localStorage.removeItem("token");
-    location.href = "/admin/login.html";
-  };
+  const logoutBtn = document.getElementById("logout");
+  if (logoutBtn) {
+    logoutBtn.onclick = () => {
+      localStorage.removeItem("token");
+      window.location.href = "/admin/login.html";
+    };
+  }
 }
