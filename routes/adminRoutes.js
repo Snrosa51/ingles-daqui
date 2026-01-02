@@ -1,11 +1,3 @@
-const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const db = require('../db/connection');
-const auth = require('../middlewares/auth');
-
-const router = express.Router();
-
 // LOGIN
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -35,11 +27,3 @@ router.post('/login', async (req, res) => {
 
   res.json({ token });
 });
-
-// ROTAS PROTEGIDAS
-router.get('/lessons', auth, async (_, res) => {
-  const [rows] = await db.query('SELECT * FROM lessons');
-  res.json(rows);
-});
-
-module.exports = router;
