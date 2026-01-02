@@ -31,6 +31,6 @@ app.get('/admin', (_, res) => {
   res.redirect('/admin/login.html');
 });
 
-app.listen(PORT, () =>
+app.listen(PORT,'0.0.0.0', () =>
   console.log(`Inglês Daqui rodando na porta ${PORT}`)
 );
