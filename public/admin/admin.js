@@ -31,10 +31,10 @@ if (form) {
     const password = document.getElementById("password").value;
 
     // 🔎 Validações básicas (FRONTEND)
-    if (!username || !password) {
-      errorBox.innerText = "Preencha usuário e senha.";
-      return;
-    }
+   if (!username.trim() || !password.trim()) {
+  errorBox.innerText = "Preencha usuário e senha.";
+  return;
+}
 
     if (password.length < 6) {
       errorBox.innerText = "A senha deve ter pelo menos 6 caracteres.";
