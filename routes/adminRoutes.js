@@ -7,7 +7,7 @@ const auth = require('../middlewares/auth');
 const router = express.Router();
 
 // LOGIN
-router.post('/admin/api/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   const [rows] = await db.query(
