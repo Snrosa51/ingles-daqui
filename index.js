@@ -7,24 +7,30 @@ const lessonRoutes = require('./routes/lessonRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(logger);
 
-//arquivos estáticos (ADMIN + CSS + JS)
+// arquivos estáticos (ADMIN + CSS + JS)
 app.use(express.static(path.join(__dirname, 'public')));
 
-//APIs
+// APIs públicas
 app.use('/api/lessons', lessonRoutes);
+
+// APIs administrativas (JWT)
 app.use('/admin/api', adminRoutes);
 
-//site público
-app.get('/', (_, res) => res.sendFile(path.join(__dirname, 'views/index.html')));
-// redireciona /admin para o login novo
+// site público
+app.get('/', (_, res) =>
+  res.sendFile(path.join(__dirname, 'views/index.html'))
+);
+
+// redireciona /admin para login
 app.get('/admin', (_, res) => {
   res.redirect('/admin/login.html');
 });
 
-app.listen(process.env.PORT, () =>
-  console.log(`Inglês Daqui rodando na porta ${process.env.PORT}`)
+app.listen(PORT, () =>
+  console.log(`Inglês Daqui rodando na porta ${PORT}`)
 );
