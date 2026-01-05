@@ -29,7 +29,6 @@ if (form) {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
-    // validação básica frontend
     if (!username || !password) {
       errorBox.innerText = "Preencha usuário e senha.";
       return;
@@ -45,21 +44,21 @@ if (form) {
       const data = await res.json();
 
       if (!res.ok) {
-        errorBox.innerText = data.message || "Erro ao fazer login";
+        errorBox.innerText = data.message || "Usuário ou senha inválidos";
         return;
       }
 
       localStorage.setItem("token", data.token);
       window.location.href = "/admin/dashboard.html";
 
-    } catch (err) {
+    } catch {
       errorBox.innerText = "Erro de conexão com o servidor";
     }
   });
 }
 
 /* =========================
-   DASHBOARD (JWT)
+   DASHBOARD
 ========================= */
 
 const list = document.getElementById("lessonList");
@@ -70,12 +69,19 @@ if (list) {
       Authorization: `Bearer ${token}`
     }
   })
-    .then(res => {
+    .then(async res => {
       if (res.status === 401) {
+        // SÓ aqui remove token
         localStorage.removeItem("token");
         window.location.href = "/admin/login.html";
-        return;
+        return null;
       }
+
+      if (!res.ok) {
+        // erro do servidor ≠ logout
+        throw new Error("Erro ao carregar aulas");
+      }
+
       return res.json();
     })
     .then(data => {
@@ -88,12 +94,12 @@ if (list) {
         list.appendChild(li);
       });
     })
-    .catch(() => {
-      localStorage.removeItem("token");
-      window.location.href = "/admin/login.html";
+    .catch(err => {
+      console.error(err);
+      list.innerHTML = "<li>Erro ao carregar aulas</li>";
     });
 
-  // logout
+  // logout manual
   document.getElementById("logout").onclick = () => {
     localStorage.removeItem("token");
     window.location.href = "/admin/login.html";
