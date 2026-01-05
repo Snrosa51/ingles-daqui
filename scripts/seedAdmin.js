@@ -8,6 +8,15 @@ async function seedAdmin() {
 
   const hash = await bcrypt.hash(password, 10);
 
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS admins (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(100) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   await db.query(
     `INSERT INTO admins (username, password_hash)
      SELECT ?, ?
@@ -17,7 +26,7 @@ async function seedAdmin() {
     [username, hash, username]
   );
 
-  console.log('✅ Admin seed criado/confirmado');
+  console.log('✅ Admin seed criado/verificado com sucesso');
   process.exit(0);
 }
 
