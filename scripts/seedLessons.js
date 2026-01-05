@@ -1,41 +1,40 @@
 require('dotenv').config();
-const db = require('../db');
+const db = require('../db/connection');
 
 async function seedLessons() {
-  const lessons = [
-    {
-      title: 'Introdução ao Inglês',
-      level: 'A1',
-      description: 'Primeiros contatos com o inglês básico.'
-    },
-    {
-      title: 'Verbo To Be',
-      level: 'A1',
-      description: 'Uso do verbo to be no presente simples.'
-    },
-    {
-      title: 'Simple Present',
-      level: 'A2',
-      description: 'Formação de frases afirmativas e negativas.'
+  try {
+    const lessons = [
+      {
+        title: 'Inglês Básico – Cumprimentos',
+        level: 'A1',
+        description: 'Aprenda cumprimentos básicos em inglês.'
+      },
+      {
+        title: 'Verbo To Be',
+        level: 'A1',
+        description: 'Uso do verbo to be no presente simples.'
+      },
+      {
+        title: 'Simple Present',
+        level: 'A2',
+        description: 'Estrutura e uso do Simple Present.'
+      }
+    ];
+
+    for (const lesson of lessons) {
+      await db.query(
+        'INSERT INTO lessons (title, level, description) VALUES (?, ?, ?)',
+        [lesson.title, lesson.level, lesson.description]
+      );
     }
-  ];
 
-  for (const lesson of lessons) {
-    await db.query(
-      `INSERT INTO lessons (title, level, description)
-       SELECT ?, ?, ?
-       WHERE NOT EXISTS (
-         SELECT 1 FROM lessons WHERE title = ?
-       )`,
-      [lesson.title, lesson.level, lesson.description, lesson.title]
-    );
+    console.log('✅ Seed de aulas concluído com sucesso!');
+    process.exit(0);
+
+  } catch (err) {
+    console.error('❌ Erro ao rodar seed:', err);
+    process.exit(1);
   }
-
-  console.log('✅ Seed de aulas concluído');
-  process.exit();
 }
 
-seedLessons().catch(err => {
-  console.error('❌ Erro no seed:', err);
-  process.exit(1);
-});
+seedLessons();
