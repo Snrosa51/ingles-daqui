@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Páginas públicas HTML
 // =======================
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views'));
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 /*app.get('/sobre', (req, res) => {
