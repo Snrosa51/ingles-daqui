@@ -4,9 +4,11 @@
 
 body {
   font-family: Arial, sans-serif;
+  text-emphasis-color:  #000000;
   margin: 0;
   padding: 0;
   background: #f3f3f3;
+  padding-left: 3cm;
 }
 
 header {
