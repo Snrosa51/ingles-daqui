@@ -6,6 +6,7 @@ async function carregarLicoes() {
 
   try {
     const resp = await fetch('/api/lessons');
+
     if (!resp.ok) {
       container.innerHTML = '<p>Não foi possível carregar as lições.</p>';
       return;
@@ -13,21 +14,34 @@ async function carregarLicoes() {
 
     const lessons = await resp.json();
 
-    if (!lessons.length) {
+    if (!Array.isArray(lessons) || lessons.length === 0) {
       container.innerHTML = '<p>Ainda não há lições cadastradas.</p>';
       return;
     }
 
-    container.innerHTML = ''; // limpa "Carregando..."
+    // limpa "Carregando..."
+    container.innerHTML = '';
 
     lessons.forEach(lesson => {
       const card = document.createElement('div');
       card.className = 'lesson-card';
 
       card.innerHTML = `
-        <h4>${lesson.title}</h4>
-        <p><strong>Nível:</strong> ${lesson.level}</p>
-        <p>${lesson.description}</p>
+        <div class="lesson-level">${lesson.level}</div>
+
+        <div class="lesson-title">
+          ${lesson.title}
+        </div>
+
+        <div class="lesson-desc">
+          ${lesson.description || 'Descrição em breve'}
+        </div>
+
+        <div class="lesson-actions">
+          <a href="/lesson.html?id=${lesson.id}">
+            Abrir lição
+          </a>
+        </div>
       `;
 
       container.appendChild(card);
