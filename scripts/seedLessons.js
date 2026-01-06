@@ -3,22 +3,17 @@ const db = require('../db/connection');
 
 async function seedLessons() {
   try {
-    console.log('📘 Iniciando seed de aulas...');
-
-    // 1️⃣ Garante que a tabela existe
     await db.query(`
       CREATE TABLE IF NOT EXISTS lessons (
-        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(255) NOT NULL UNIQUE,
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
         level VARCHAR(10) NOT NULL,
         description TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      ) ENGINE=InnoDB
-      DEFAULT CHARSET=utf8mb4
-      COLLATE=utf8mb4_unicode_ci;
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_lesson (title, level)
+      )
     `);
 
-    // 2️⃣ Aulas padrão
     const lessons = [
       {
         title: 'Inglês Básico – Cumprimentos',
@@ -37,17 +32,21 @@ async function seedLessons() {
       }
     ];
 
-    // 3️⃣ Insere somente se não existir
     for (const lesson of lessons) {
       await db.query(
         `
         INSERT INTO lessons (title, level, description)
-        SELECT ?, ?, ?
-        WHERE NOT EXISTS (
-          SELECT 1 FROM lessons WHERE title = ?
-        )
+VALUES (?, ?, ?)
+ON DUPLICATE KEY UPDATE
+description = VALUES(description);
         `,
-        [lesson.title, lesson.level, lesson.description, lesson.title]
+        [
+          lesson.title,
+          lesson.level,
+          lesson.description,
+          lesson.title,
+          lesson.level
+        ]
       );
     }
 
@@ -61,3 +60,4 @@ async function seedLessons() {
 }
 
 seedLessons();
+
