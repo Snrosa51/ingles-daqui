@@ -6,33 +6,56 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 /* =========================
-   Middlewares básicos
+   MIDDLEWARES BÁSICOS
 ========================= */
 app.use(express.json());
 
 /* =========================
-   Arquivos estáticos
+   ARQUIVOS ESTÁTICOS
+   (CSS, JS, imagens)
 ========================= */
-// public → JS, CSS, imagens
 app.use(express.static(path.join(__dirname, 'public')));
 
-// views → páginas HTML públicas
-app.use(express.static(path.join(__dirname, 'views')));
+/* =========================
+   PÁGINAS PÚBLICAS (HTML)
+========================= */
+
+// Página inicial
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+// Sobre
+app.get('/sobre', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'sobre.html'));
+});
+
+// Contato
+app.get('/contato', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'contato.html'));
+});
+
+// Links úteis
+app.get('/links-uteis', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'links-uteis.html'));
+});
 
 /* =========================
-   Rotas da API
+   ROTAS DA API
 ========================= */
 app.use('/admin/api', require('./routes/adminRoutes'));
 app.use('/api/lessons', require('./routes/lessonRoutes'));
 
 /* =========================
-   Fallback 404
+   FALLBACK 404
 ========================= */
 app.use((req, res) => {
   res.status(404).send('Página não encontrada');
 });
 
-/* ========================= */
+/* =========================
+   START SERVER
+========================= */
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Inglês Daqui rodando na porta ${PORT}`);
+  console.log(`✅ Inglês The Key rodando na porta ${PORT}`);
 });
