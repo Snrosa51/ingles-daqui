@@ -1,18 +1,19 @@
 const API = "/admin/api";
 const token = localStorage.getItem("token");
+const path = location.pathname;
 
 /* =========================
-   PROTEÇÃO DE ROTAS
+   PROTEÇÃO DE ROTAS (INICIAL)
 ========================= */
 
-// Se já está logado, não deixa voltar para o login
-if (token && location.pathname.includes("login")) {
-  window.location.href = "/admin/dashboard.html";
+// Login → Dashboard (se já tem token)
+if (token && path.endsWith("/login.html")) {
+  window.location.replace("/admin/dashboard.html");
 }
 
-// Se NÃO está logado, bloqueia dashboard
-if (!token && location.pathname.includes("dashboard")) {
-  window.location.href = "/admin/login.html";
+// Dashboard → Login (se não tem token)
+if (!token && path.endsWith("/dashboard.html")) {
+  window.location.replace("/admin/login.html");
 }
 
 /* =========================
@@ -25,6 +26,7 @@ const errorBox = document.getElementById("error");
 if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    errorBox.innerText = "";
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
@@ -48,10 +50,13 @@ if (form) {
         return;
       }
 
+      // SALVA TOKEN
       localStorage.setItem("token", data.token);
-      window.location.href = "/admin/dashboard.html";
 
-    } catch {
+      // REDIRECIONA
+      window.location.replace("/admin/dashboard.html");
+
+    } catch (err) {
       errorBox.innerText = "Erro de conexão com o servidor";
     }
   });
@@ -69,16 +74,15 @@ if (list) {
       Authorization: `Bearer ${token}`
     }
   })
-    .then(async res => {
+    .then(res => {
       if (res.status === 401) {
-        // SÓ aqui remove token
+        // SÓ AQUI remove token
         localStorage.removeItem("token");
-        window.location.href = "/admin/login.html";
+        window.location.replace("/admin/login.html");
         return null;
       }
 
       if (!res.ok) {
-        // erro do servidor ≠ logout
         throw new Error("Erro ao carregar aulas");
       }
 
@@ -99,9 +103,9 @@ if (list) {
       list.innerHTML = "<li>Erro ao carregar aulas</li>";
     });
 
-  // logout manual
+  // Logout manual
   document.getElementById("logout").onclick = () => {
     localStorage.removeItem("token");
-    window.location.href = "/admin/login.html";
+    window.location.replace("/admin/login.html");
   };
 }
