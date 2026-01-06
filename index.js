@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-/*app.get('/sobre', (req, res) => {
+app.get('/sobre', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'sobre.html'));
 });
 
@@ -34,7 +34,7 @@ app.get('/contato', (req, res) => {
 app.get('/links-uteis', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'links-uteis.html'));
 });
-*/
+
 // =======================
 // ROTAS DA API
 // =======================
