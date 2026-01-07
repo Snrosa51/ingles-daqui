@@ -15,12 +15,13 @@ app.use(express.json());
    (CSS, JS, imagens)
 ========================= */
 app.use(express.static(path.join(__dirname, 'public')));
-
 /* =========================
-   PÁGINAS PÚBLICAS (HTML)
+   PÁGINAS das VIEWS (HTML)
 ========================= */
+//PÁGINAS HTML (views)
+app.use(express.static(path.join(__dirname, 'views')));
 
-// Página inicial
+/* Página inicial
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
@@ -40,9 +41,9 @@ app.get('/links-uteis', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'links-uteis.html'));
 });
 // Links úteis
-app.get('/pagInicial', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'pagInicial.html'));
-})
+app.get('/exerciciosClassroom', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'exerciciosClassroom.html'));
+})*/
 
 /* =========================
    ROTAS DA API
