@@ -39,6 +39,10 @@ app.get('/contato', (req, res) => {
 app.get('/links-uteis', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'links-uteis.html'));
 });
+// Links úteis
+app.get('/pagInicial', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'pagInicial.html'));
+})
 
 /* =========================
    ROTAS DA API
