@@ -4,8 +4,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  font-size: 20px;
-  color:  #5e0505;
+  color:  #450202;
   margin: 0;
   padding: 0;
   background: #f3f3f3;
@@ -29,11 +28,15 @@ h2{
     font-size: medium;
 }
 
+h3{
+    font-size: medium;
+}
+
 p{
     font-size: medium;
 }
 
-main {
+main p{
     font-size: large;
 }
 
@@ -120,4 +123,19 @@ footer {
 
 .lesson-actions a:hover {
   background: #0046cc;
+}
+
+.lesson-page {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.lesson-box {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.lesson-body h3 {
+  margin-top: 1.2rem;
 }
