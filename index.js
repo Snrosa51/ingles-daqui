@@ -1,10 +1,10 @@
-dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+
 /* =========================
    ENV (ANTES DE TUDO)
 ========================= */
 const path = require("path");
 const dotenv = require("dotenv");
-
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 const envFile = process.env.ENV_FILE || ".env";
 
 console.log("ENV_FILE =", process.env.ENV_FILE);
