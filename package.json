@@ -3,10 +3,12 @@
   "version": "2.0.0",
   "description": "Plataforma educacional Inglês Daqui",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
+ 
+"scripts": {
+  "dev": "cross-env NODE_ENV=development ENV_FILE=.env.dev node index.js",
+  "start": "cross-env NODE_ENV=production ENV_FILE=.env node index.js"
+},
+
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
@@ -15,5 +17,8 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.10.0"
+  },
+   "devDependencies":{
+    "cross-env": "^7.0.3"
   }
 }

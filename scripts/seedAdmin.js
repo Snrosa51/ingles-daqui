@@ -1,4 +1,4 @@
-require('dotenv').config(); // OK manter (não quebra)
+require("./_loadEnv");
 const bcrypt = require('bcryptjs');
 const db = require('../db/connection');
 

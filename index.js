@@ -1,10 +1,31 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+/* =========================
+   ENV (ANTES DE TUDO)
+========================= */
+const path = require("path");
+const dotenv = require("dotenv");
 
+const envFile = process.env.ENV_FILE || ".env";
+
+console.log("ENV_FILE =", process.env.ENV_FILE);
+console.log("NODE_ENV =", process.env.NODE_ENV);
+console.log("DB_HOST =", process.env.DB_HOST);
+
+/* =========================
+   CONFIG CENTRALIZADA
+========================= */
+const env = require("./config/env");
+
+/* =========================
+   DEPENDÊNCIAS
+========================= */
+const express = require("express");
+
+/* =========================
+   APP
+========================= */
 const app = express();
-const PORT = process.env.PORT || 3000;
-
+const { testConnection } = require("./db/connection");
 /* =========================
    MIDDLEWARES BÁSICOS
 ========================= */
@@ -12,55 +33,32 @@ app.use(express.json());
 
 /* =========================
    ARQUIVOS ESTÁTICOS
-   (CSS, JS, imagens)
 ========================= */
-app.use(express.static(path.join(__dirname, 'public')));
-/* =========================
-   PÁGINAS das VIEWS (HTML)
-========================= */
-//PÁGINAS HTML (views)
-app.use(express.static(path.join(__dirname, 'views')));
-
-/* Página inicial
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
-
-// Sobre
-app.get('/sobre', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'sobre.html'));
-});
-
-// Contato
-app.get('/contato', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'contato.html'));
-});
-
-// Links úteis
-app.get('/links-uteis', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'links-uteis.html'));
-});
-// Links úteis
-app.get('/exerciciosClassroom', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'exerciciosClassroom.html'));
-})*/
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "views")));
 
 /* =========================
    ROTAS DA API
 ========================= */
-app.use('/admin/api', require('./routes/adminRoutes'));
-app.use('/api/lessons', require('./routes/lessonRoutes'));
+app.use("/admin/api", require("./routes/adminRoutes"));
+app.use("/api/lessons", require("./routes/lessonRoutes"));
 
 /* =========================
    FALLBACK 404
 ========================= */
 app.use((req, res) => {
-  res.status(404).send('Página não encontrada');
+  res.status(404).send("Página não encontrada");
 });
 
 /* =========================
-   START SERVER
+   START SERVER (ÚNICO!)
 ========================= */
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Inglês The Key rodando na porta ${PORT}`);
-});
+(async () => {
+  await testConnection();
+
+app.listen(env.app.port, "0.0.0.0", () => {
+  console.log(
+    `✅ Inglês Daqui rodando | PORT=${env.app.port} | ENV=${env.app.nodeEnv}`
+  );
+  });
+})();

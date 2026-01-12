@@ -1,4 +1,8 @@
-require("./_loadEnv");
+
+-- Na verdade é um JS, do <seedLessonContent class="js">que preciso ajustar
+</seedLessonContent>
+
+require('dotenv').config();
 const db = require('../db/connection');
 
 async function seedLessonContent() {

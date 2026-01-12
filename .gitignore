@@ -1,6 +1,23 @@
-
+# env files (segredos)
 .env
-.env*
+.env.dev
+.env.*.local
+
+# logs e runtime
 logs/
+*.log
+
+# dependências
 node_modules/
+
+# build / cache
+dist/
+build/
+.coverage/
+coverage/
+*.tgz
+
+# sistema
 .DS_Store
+Thumbs.db
+

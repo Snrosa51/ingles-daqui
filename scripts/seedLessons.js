@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("./_loadEnv");
 const db = require('../db/connection');
 
 async function seedLessons() {
