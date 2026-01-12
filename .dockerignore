@@ -1,0 +1,11 @@
+.env
+.env.dev
+.env.*.local
+node_modules
+logs
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+*.swp
+
