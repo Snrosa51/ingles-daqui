@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: ingles-daqui-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: ingles_daqui
+      MYSQL_USER: ingles
+      MYSQL_PASSWORD: senha_forte
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: ingles-daqui-app
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+   env_file:
+      - .env
+  environment:
+      - ENV_FILE=.env
+      - NODE_ENV=production
+volumes:
+  mysql_data:
+      - ./logs:/app/logs
