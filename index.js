@@ -26,7 +26,7 @@ const express = require("express");
 ========================= */
 const app = express();
 const { testConnection } = require("./db/connection");
-/* =========================
+ /* =========================
    MIDDLEWARES BÁSICOS
 ========================= */
 app.use(express.json());

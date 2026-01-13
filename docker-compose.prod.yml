@@ -1,4 +1,6 @@
 services:
+  db:
+    ports: []   # não expõe MySQL na internet em produção
   app:
     environment:
       NODE_ENV: "production"
