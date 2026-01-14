@@ -15,9 +15,10 @@ const pool = mysql.createPool({
 
   // Datas em formato legível
   dateStrings: true,
-
+ // ✅ IMPORTANTE: desliga TLS/SSL dentro da rede Docker (evita erro do certificado autoassinado)
+  ssl: false,
   // (Opcional) se precisar de timezone:
-  // timezone: "Z",
+  //timezone: "Z",
 });
 
 async function testConnection() {
