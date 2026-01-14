@@ -6,7 +6,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 const envFile = process.env.ENV_FILE || ".env";
-
+const PORT = process.env.PORT || 3000;
 console.log("ENV_FILE =", process.env.ENV_FILE);
 console.log("NODE_ENV =", process.env.NODE_ENV);
 console.log("DB_HOST =", process.env.DB_HOST);
