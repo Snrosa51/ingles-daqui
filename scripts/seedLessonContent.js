@@ -1,9 +1,15 @@
-require("./_loadEnv");
-const db = require('../db/connection');
+// scripts/seedLessonContent.js
+const path = require("path");
+const dotenv = require("dotenv");
+
+// respeita ENV_FILE se existir; senão usa ".env"
+const envFile = process.env.ENV_FILE || ".env";
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+
+const db = require("../db/connection");
 
 async function seedLessonContent() {
   try {
-    // Exemplo: conteúdo para a lição ID = 1 (Simple Present)
     const content = `
 <h3>📘 Explicação</h3>
 <p>O Simple Present é usado para hábitos, rotinas e fatos gerais.</p>
@@ -22,22 +28,13 @@ async function seedLessonContent() {
 <p>Complete: She ___ (work) here.</p>
 `;
 
-    const lessonId = 1;
+    const lessonId = 3; // ou 1, se você quiser mesmo a lição 1
+    await db.query("UPDATE lessons SET content = ? WHERE id = ?", [content, lessonId]);
 
-    await db.query(
-      `
-      UPDATE lessons
-      SET content = ?
-      WHERE id = ?
-      `,
-      [content, lessonId]
-    );
-
-    console.log('✅ Conteúdo da lição atualizado com sucesso');
+    console.log("✅ Conteúdo da lição atualizado com sucesso");
     process.exit(0);
-
   } catch (err) {
-    console.error('❌ Erro ao rodar seedLessonContent:', err);
+    console.error("❌ Erro ao rodar seedLessonContent:", err);
     process.exit(1);
   }
 }
