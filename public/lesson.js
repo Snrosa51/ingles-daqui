@@ -1,42 +1,66 @@
-async function carregarLicao() {
-  const container = document.getElementById("lesson-content");
-
-  // Pega o ?id= da URL
+// public/lesson.js
+function getLessonIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  const lessonId = params.get("id");
+  const id = params.get("id");
+  return id ? Number(id) : null;
+}
 
-  if (!lessonId) {
-    container.innerHTML = "<p>Lição não encontrada.</p>";
+function escapeHtml(str = "") {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// Se você guardar content como HTML “pronto”, você pode renderizar direto.
+// Se você guardar texto simples, use escapeHtml e converta \n em <br>.
+function renderContent(content) {
+  if (!content) return "<p><em>Sem conteúdo.</em></p>";
+
+  // Opção A (segura): tratar como texto
+  const safe = escapeHtml(content).replaceAll("\n", "<br>");
+  return `<p>${safe}</p>`;
+
+  // Opção B (se você salvar HTML no DB):
+  // return content;
+}
+
+async function carregarLicao() {
+  const id = getLessonIdFromUrl();
+
+  if (!id || Number.isNaN(id)) {
+    document.getElementById("lessonTitle").textContent = "ID inválido";
+    document.getElementById("lessonMeta").textContent = "";
+    document.getElementById("lessonDesc").textContent = "";
+    document.getElementById("lessonContent").innerHTML =
+      "<p>Abra a lição pela lista inicial.</p>";
     return;
   }
 
   try {
-    const resp = await fetch(`/api/lessons/${lessonId}`);
+    const resp = await fetch(`/api/lessons/${id}`, {
+      headers: { Accept: "application/json" },
+    });
 
     if (!resp.ok) {
-      container.innerHTML = "<p>Erro ao carregar a lição.</p>";
-      return;
+      const text = await resp.text().catch(() => "");
+      throw new Error(`HTTP ${resp.status} ${resp.statusText} ${text}`.slice(0, 300));
     }
 
     const lesson = await resp.json();
 
-    container.innerHTML = `
-      <div class="lesson-box">
-        <span class="lesson-level">${lesson.level}</span>
-        <h2 class="lesson-title">${lesson.title}</h2>
-        <p class="lesson-desc">${lesson.description}</p>
-
-        <hr>
-
-        <div class="lesson-body">
-          ${lesson.content || "<p>Conteúdo em construção.</p>"}
-        </div>
-      </div>
-    `;
+    document.getElementById("lessonTitle").textContent = lesson.title || `Lição ${id}`;
+    document.getElementById("lessonMeta").textContent = `Nível: ${lesson.level || "-"}`;
+    document.getElementById("lessonDesc").textContent = lesson.description || "";
+    document.getElementById("lessonContent").innerHTML = renderContent(lesson.content);
 
   } catch (err) {
-    console.error(err);
-    container.innerHTML = "<p>Erro de conexão.</p>";
+    console.error("Erro ao carregar lição:", err);
+    document.getElementById("lessonTitle").textContent = "Erro ao carregar lição";
+    document.getElementById("lessonContent").innerHTML =
+      "<p>Não foi possível carregar a lição agora. Tente novamente.</p>";
   }
 }
 
