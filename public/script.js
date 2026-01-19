@@ -5,7 +5,10 @@ async function carregarLicoes() {
   if (!container) return;
 
   try {
-    const resp = await fetch('/api/lessons');
+    const resp = await fetch("/api/lessons", {
+  headers: { Accept: "application/json" },
+});
+
 
     if (!resp.ok) {
       container.innerHTML = '<p>Não foi possível carregar as lições.</p>';
