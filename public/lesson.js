@@ -5,43 +5,59 @@ function getLessonIdFromUrl() {
   return id ? Number(id) : null;
 }
 
-function escapeHtml(str = "") {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+/**
+ * Sanitização mínima (não é perfeita, mas evita o básico):
+ * - remove <script>...</script>
+ * - remove atributos on*="..." (onclick, onload, etc.)
+ *
+ * Se um dia você quiser segurança forte mesmo:
+ * use DOMPurify no front.
+ */
+function sanitizeHtml(html = "") {
+  let out = String(html);
+
+  // remove <script>...</script>
+  out = out.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+
+  // remove atributos on*=
+  out = out.replace(/\son\w+\s*=\s*(".*?"|'.*?'|[^\s>]+)/gi, "");
+
+  return out;
 }
 
-// Se você guardar content como HTML “pronto”, você pode renderizar direto.
-// Se você guardar texto simples, use escapeHtml e converta \n em <br>.
+// Como você salva HTML no DB, renderiza direto (com sanitização mínima)
 function renderContent(content) {
   if (!content) return "<p><em>Sem conteúdo.</em></p>";
 
-  // Opção A (segura): tratar como texto
-  const safe = escapeHtml(content).replaceAll("\n", "<br>");
-  return `<p>${safe}</p>`;
+  // limpeza leve de caracteres estranhos (opcional)
+  let html = String(content);
 
-  // Opção B (se você salvar HTML no DB):
-  // return content;
+  // remove um "n" solto que apareceu no seu conteúdo
+  html = html.replace(/\n\s*n\s*<li>/g, "\n  <li>");
+
+  return sanitizeHtml(html);
 }
 
 async function carregarLicao() {
   const id = getLessonIdFromUrl();
 
+  const titleEl = document.getElementById("lessonTitle");
+  const metaEl = document.getElementById("lessonMeta");
+  const descEl = document.getElementById("lessonDesc");
+  const contentEl = document.getElementById("lessonContent");
+
   if (!id || Number.isNaN(id)) {
-    document.getElementById("lessonTitle").textContent = "ID inválido";
-    document.getElementById("lessonMeta").textContent = "";
-    document.getElementById("lessonDesc").textContent = "";
-    document.getElementById("lessonContent").innerHTML =
-      "<p>Abra a lição pela lista inicial.</p>";
+    titleEl.textContent = "ID inválido";
+    metaEl.textContent = "";
+    descEl.textContent = "";
+    contentEl.innerHTML = "<p>Abra a lição pela lista inicial.</p>";
     return;
   }
 
   try {
     const resp = await fetch(`/api/lessons/${id}`, {
       headers: { Accept: "application/json" },
+      cache: "no-store",
     });
 
     if (!resp.ok) {
@@ -51,16 +67,19 @@ async function carregarLicao() {
 
     const lesson = await resp.json();
 
-    document.getElementById("lessonTitle").textContent = lesson.title || `Lição ${id}`;
-    document.getElementById("lessonMeta").textContent = `Nível: ${lesson.level || "-"}`;
-    document.getElementById("lessonDesc").textContent = lesson.description || "";
-    document.getElementById("lessonContent").innerHTML = renderContent(lesson.content);
+    titleEl.textContent = lesson.title || `Lição ${id}`;
+    metaEl.textContent = `Nível: ${lesson.level || "-"}`;
+    descEl.textContent = lesson.description || "";
+
+    // ✅ aqui está o ponto principal: renderizar como HTML
+    contentEl.innerHTML = renderContent(lesson.content);
 
   } catch (err) {
     console.error("Erro ao carregar lição:", err);
-    document.getElementById("lessonTitle").textContent = "Erro ao carregar lição";
-    document.getElementById("lessonContent").innerHTML =
-      "<p>Não foi possível carregar a lição agora. Tente novamente.</p>";
+    titleEl.textContent = "Erro ao carregar lição";
+    metaEl.textContent = "";
+    descEl.textContent = "";
+    contentEl.innerHTML = "<p>Não foi possível carregar a lição agora. Tente novamente.</p>";
   }
 }
 
