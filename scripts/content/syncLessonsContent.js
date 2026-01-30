@@ -8,6 +8,7 @@
  * Regras:
  * - Arquivos em: content/lessons/0001.html, 0002.html...
  * - Bloqueia <script> por segurança básica
+ * - Faz UPSERT: cria/atualiza a linha da lição automaticamente
  */
 
 const fs = require("fs");
@@ -21,6 +22,7 @@ function padId(id) {
 }
 
 function idFromFilename(filename) {
+  // "0003.html" -> 3
   return Number(filename.replace(".html", ""));
 }
 
@@ -41,6 +43,22 @@ function validateHtml(html, filename) {
   }
 }
 
+/**
+ * UPSERT (cria ou atualiza)
+ * Observação: assume que `lessons.id` é PRIMARY KEY.
+ */
+async function upsertLessonContent(id, html) {
+  return query(
+    `
+    INSERT INTO lessons (id, content)
+    VALUES (?, ?)
+    ON DUPLICATE KEY UPDATE
+      content = VALUES(content)
+    `,
+    [id, html]
+  );
+}
+
 async function syncOne(id) {
   const filename = `${padId(id)}.html`;
   const filePath = path.join(CONTENT_DIR, filename);
@@ -52,17 +70,9 @@ async function syncOne(id) {
   const html = fs.readFileSync(filePath, "utf8");
   validateHtml(html, filename);
 
-  const result = await query("UPDATE lessons SET content = ? WHERE id = ?", [
-    html,
-    id,
-  ]);
+  await upsertLessonContent(id, html);
 
-  // mysql2 pode retornar OkPacket com affectedRows
-  if (result && typeof result.affectedRows === "number" && result.affectedRows === 0) {
-    console.warn(`⚠️ Nenhuma linha atualizada. Existe lição id=${id} na tabela lessons?`);
-  } else {
-    console.log(`✅ Sync lição ${id} (${filename})`);
-  }
+  console.log(`✅ Sync (UPSERT) lição ${id} (${filename})`);
 }
 
 async function syncAll() {
@@ -77,14 +87,20 @@ async function syncAll() {
 
   for (const f of files) {
     const id = idFromFilename(f);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      console.warn(`⚠️ Ignorado (nome inválido): ${f}`);
+      continue;
+    }
+
     const filePath = path.join(CONTENT_DIR, f);
     const html = fs.readFileSync(filePath, "utf8");
 
     validateHtml(html, f);
-    await query("UPDATE lessons SET content = ? WHERE id = ?", [html, id]);
+    await upsertLessonContent(id, html);
 
     ok++;
-    console.log(`✅ Sync lição ${id} (${f})`);
+    console.log(`✅ Sync (UPSERT) lição ${id} (${f})`);
   }
 
   console.log(`\nFinalizado. Arquivos sincronizados: ${ok}`);
